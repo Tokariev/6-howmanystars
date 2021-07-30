@@ -51,6 +51,31 @@ class SearchBar extends Component {
     }
   };
 
+  createList = () => {
+    if (this.state.firs5names.length === 0)
+      return (
+        <li key="addReview" className="list-group-item">
+          <button class="btn btn-primary" type="submit">
+            Add a first review ...
+          </button>
+        </li>
+      );
+    else
+      return this.state.firs5names.map((name, indx) => (
+        <li key={indx} className="list-group-item">
+          {name["name"]}
+          <Box component="fieldset" borderColor="transparent">
+            <Rating
+              name="read-only"
+              value={name["rating"]}
+              readOnly
+              precision={0.5}
+            />
+          </Box>
+        </li>
+      ));
+  };
+
   render() {
     return (
       <div className="container m1">
@@ -66,19 +91,7 @@ class SearchBar extends Component {
           <br />
         </div>
         <ul className="list-group" id="myList">
-          {this.state.firs5names.map((name, indx) => (
-            <li key={indx} className="list-group-item">
-              {name["name"]}
-              <Box component="fieldset" borderColor="transparent">
-                <Rating
-                  name="read-only"
-                  value={name["rating"]}
-                  readOnly
-                  precision={0.5}
-                />
-              </Box>
-            </li>
-          ))}
+          {this.createList()}
         </ul>
       </div>
     );
