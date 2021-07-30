@@ -2,49 +2,51 @@ import React, { Component } from "react";
 import firebase from "../firebase/firebase";
 
 class SearchBar extends Component {
-  render() {
-    const search = () => {
-      const db = firebase.database();
+  constructor(props) {
+    super(props);
+    this.state = { first5Names: this.fetchFirst5Names() };
+  }
 
-      let name = "firebase_google_com";
+  fetchFirst5Names = () => {
+    const resultList = [];
+    const db = firebase.database();
+    const subjectsRef = db.ref("subjects");
+    const first5names = subjectsRef.orderByChild("name").limitToLast(5);
 
-      db.ref("subjects/" + name).set({
-        name: "firebase.google.com",
-        rating: 3.1,
-        reviews: [
-          {
-            who: "MAC_Adress_1",
-            message: "Very bad!",
-            picture: [
-              { picture: "url://to_fire_store_db" },
-              { picture: "url://to_fire_store_db" },
-            ],
-          },
-          {
-            who: "MAC_Adress_2",
-            message: "Very bad!",
-            picture: [
-              { picture: "url://to_fire_store_db" },
-              { picture: "url://to_fire_store_db" },
-            ],
-          },
-        ],
+    first5names.once("value", (snapshot) => {
+      snapshot.forEach((child) => {
+        resultList.push(child.val());
+        console.log(child.val());
       });
-    };
+    });
+
+    return resultList;
+  };
+
+  render() {
+    const search = () => {};
 
     return (
-      <div className="input-group mb-3" onChange={search}>
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Find or create a review..."
-          aria-label="Recipient's username"
-          aria-describedby="basic-addon2"
-        />
-        <br />
-        <span className="input-group-text" id="basic-addon2">
-          @
-        </span>
+      <div className="container m1">
+        <div className="input-group mb-3" onChange={search}>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Find or create a review..."
+            aria-label="Recipient's username"
+            aria-describedby="basic-addon2"
+          />
+          <br />
+          <span className="input-group-text" id="basic-addon2">
+            @
+          </span>
+          <br />
+        </div>
+        <ul className="list-group" id="myList">
+          {this.state.first5Names.map((name) => (
+            <li>{name}</li>
+          ))}
+        </ul>
       </div>
     );
   }
