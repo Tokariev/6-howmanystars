@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import firebase from "../firebase/firebase";
+import { db } from "../firebase/firebase";
 
 import Rating from "@material-ui/lab/Rating";
 import Typography from "@material-ui/core/Typography";
@@ -12,7 +13,6 @@ class SearchBar extends Component {
   }
   async componentDidMount() {
     try {
-      const db = firebase.database();
       this.setState({ readError: null });
 
       db.ref("subjects")
@@ -30,11 +30,33 @@ class SearchBar extends Component {
     }
   }
 
+  search = (event) => {
+    const serchText = event.target.value;
+
+    try {
+      this.setState({ readError: null });
+      db.ref("subjects")
+        .orderByChild("name")
+        .startAt(serchText)
+        .endAt(serchText + "\uf8ff")
+        .on("value", (snapshot) => {
+          let searchResult = [];
+          snapshot.forEach((snap) => {
+            searchResult.push(snap.val());
+          });
+          this.setState({ firs5names: searchResult });
+        });
+    } catch (error) {
+      this.setState({ readError: error.message });
+    }
+  };
+
   render() {
     return (
       <div className="container m1">
         <div className="input-group mb-3 mt-3">
           <input
+            onChange={this.search}
             type="text"
             className="form-control"
             placeholder="Find or create a review..."
